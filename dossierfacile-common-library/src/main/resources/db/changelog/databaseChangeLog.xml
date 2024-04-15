@@ -139,5 +139,7 @@
     <include file="db/migration/202401300000-change-denied-options-sub-category.xml" />
     <include file="db/migration/202402210000-create-operation-access-token.xml" />
     <include file="db/migration/20240308110000-add-comment-document-analysis.xml" />
+    <include file="db/migration/202309270001-create-invitation-token.xml" />
+
 
 </databaseChangeLog>

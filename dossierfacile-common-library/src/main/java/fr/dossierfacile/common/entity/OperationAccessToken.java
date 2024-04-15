@@ -29,6 +29,11 @@ public class OperationAccessToken {
     @Column(name = "content")
     private String content;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apartment_sharing_id")
+    @ToString.Exclude
+    private ApartmentSharing apartmentSharing;
+
     @Column(nullable = false, length = 96, unique = true)
     private String token;
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.10.xsd">
+    <changeSet id="202309270001-01" author="Fabien (manual)">
+        <addColumn tableName="invitation_token">
+            <column name="apartment_sharing_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="202309270001-02" author="Fabien (manual)">
+        <addForeignKeyConstraint baseColumnNames="apartment_sharing_id" baseTableName="invitation_token"
+                                 constraintName="fk_apartment_sharing_id_on_invitation_token"
+                                 deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="apartment_sharing"
+                                 validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>

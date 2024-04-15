@@ -11,6 +11,8 @@ public interface MailService {
 
     void sendEmailForFlatmates(User flatmate, User guest, PasswordRecoveryToken passwordRecoveryToken, ApplicationType applicationType);
 
+    void sendEmailInvitationForExistingFlatmates(User flatmate, User guest, InvitationToken invitationToken, ApplicationType applicationType);
+
     void sendEmailAccountDeleted(User user);
 
     void sendEmailAccountCompleted(Tenant tenant);
@@ -34,4 +36,6 @@ public interface MailService {
     void sendEmailPartnerAccessRevoked(Tenant receiver, UserApi userApi, Tenant revocationRequester);
 
     void sendDefaultEmailExpiredToken(String email, OperationAccessToken token);
+
+    void sendEmailExpiredInvitation(String email, Tenant mainTenant);
 }

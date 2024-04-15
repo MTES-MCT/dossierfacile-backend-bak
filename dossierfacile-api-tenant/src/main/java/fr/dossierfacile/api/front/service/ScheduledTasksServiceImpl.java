@@ -1,13 +1,13 @@
 package fr.dossierfacile.api.front.service;
 
+import fr.dossierfacile.api.front.service.interfaces.InvitationTokenService;
 import fr.dossierfacile.api.front.service.interfaces.MailService;
 import fr.dossierfacile.api.front.service.interfaces.ScheduledTasksService;
 import fr.dossierfacile.api.front.service.interfaces.StatsService;
-import fr.dossierfacile.common.entity.ConfirmationToken;
-import fr.dossierfacile.common.entity.OperationAccessToken;
-import fr.dossierfacile.common.entity.Tenant;
+import fr.dossierfacile.common.entity.*;
 import fr.dossierfacile.common.enums.ApplicationType;
 import fr.dossierfacile.common.enums.TenantFileStatus;
+import fr.dossierfacile.common.enums.TenantType;
 import fr.dossierfacile.common.repository.ConfirmationTokenRepository;
 import fr.dossierfacile.common.repository.TenantCommonRepository;
 import fr.dossierfacile.common.service.interfaces.OperationAccessTokenService;
@@ -37,7 +37,9 @@ public class ScheduledTasksServiceImpl implements ScheduledTasksService {
     private final OperationAccessTokenService operationAccessTokenService;
     private final MailService mailService;
     private final StatsService statsService;
+    private final InvitationTokenService invitationTokenService;
     private final Object sendEmailLock = new Object();
+
     @Value("${days_for_email_account_validation_reminder}")
     private Long daysForEmailAccountValidationReminder;
     @Value("${days_for_account_completion_reminder}")
@@ -158,11 +160,17 @@ public class ScheduledTasksServiceImpl implements ScheduledTasksService {
             log.info(tokens.size() + " expired tokens found - delete the tokens and send notification");
             for (OperationAccessToken token : tokens) {
                 if (StringUtils.isNotBlank(token.getEmail())) {
-                    mailService.sendDefaultEmailExpiredToken(token.getEmail(), token);
+                    switch(token.getOperationAccessType()){
+                        case INVITATION_TO_APARTMENT_SHARING -> {
+                            Optional<Tenant> createTenant = token.getApartmentSharing().getTenants().stream().filter( t -> t.getTenantType() == TenantType.CREATE).findFirst();
+                            createTenant.ifPresent(tenant -> mailService.sendEmailExpiredInvitation(token.getEmail(), tenant));
+                        }
+                        case DISPLAY_CLIENT_SECRET -> mailService.sendDefaultEmailExpiredToken(token.getEmail(), token);
+                    }
+                    ;
                 }
                 operationAccessTokenService.delete(token);
             }
         }
     }
-
 }

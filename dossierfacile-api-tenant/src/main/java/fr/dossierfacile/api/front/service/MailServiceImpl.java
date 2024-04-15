@@ -67,29 +67,39 @@ public class MailServiceImpl implements MailService {
     private Long templateIdContactSupport;
     @Value("${sendinblue.template.id.token.expiration}")
     private Long templateIdTokenExpiration;
-    @Value("${link.after.completed.default}")
-    private String defaultCompletedUrl;
-    @Value("${link.after.created.default}")
-    private String defaultCreatedUrl;
     @Value("${sendinblue.template.id.share.file}")
     private Long templateIdShareFile;
     @Value("${sendinblue.template.id.partner.access.revoked}")
     private Long templateIDPartnerAccessRevoked;
+
+    @Value("${sendinblue.template.id.application.couple.invitation.existing}")
+    private Long templateIdCoupleApplicationInvitationForExistingTenant;
+    @Value("${sendinblue.template.id.application.group.invitation.existing}")
+    private Long templateIdGroupApplicationInvitationForExistingTenant;
+    @Value("${sendinblue.template.id.application.invitation.expiration}")
+    private Long templateIdApplicationInvitationExpired;
+    @Value("${link.after.completed.default}")
+    private String defaultCompletedUrl;
+    @Value("${link.after.created.default}")
+    private String defaultCreatedUrl;
+    @Value("${link.accept.invitation.existing.tenant}")
+    private String acceptInvitationUrlForExistingTenant;
+
     @Value("${sendinblue.domains.blacklist:example.com}")
     private List<String> blackListedDomains;
 
-    private void sendEmailToTenant(User tenant, Map<String, String> params, Long templateId) {
-        if (tenant.getEmail() == null) {
+    private void sendEmailToTenant(String email,String tenantFullName, Map<String, String> params, Long templateId) {
+        if (email == null) {
             return;
         }
-        boolean blackListed = blackListedDomains.stream().anyMatch(domain -> tenant.getEmail().endsWith(domain));
+        boolean blackListed = blackListedDomains.stream().anyMatch(domain -> email.endsWith(domain));
         if (blackListed) {
             return;
         }
         SendSmtpEmailTo sendSmtpEmailTo = new SendSmtpEmailTo();
-        sendSmtpEmailTo.setEmail(tenant.getEmail());
-        if (!Strings.isNullOrEmpty(tenant.getFullName())) {
-            sendSmtpEmailTo.setName(tenant.getFullName());
+        sendSmtpEmailTo.setEmail(email);
+        if (!Strings.isNullOrEmpty(tenantFullName)) {
+            sendSmtpEmailTo.setName(tenantFullName);
         }
         SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
         sendSmtpEmail.templateId(templateId);
@@ -102,7 +112,9 @@ public class MailServiceImpl implements MailService {
             log.error("Email Api Exception" + Sentry.captureException(e), e);
         }
     }
-
+    private void sendEmailToTenant(User tenant, Map<String, String> params, Long templateId) {
+        sendEmailToTenant(tenant.getEmail(),tenant.getFullName(), params, templateId);
+    }
 
     @Override
     public void sendEmailConfirmAccount(User user, ConfirmationToken confirmationToken) {
@@ -135,6 +147,23 @@ public class MailServiceImpl implements MailService {
             variables.put("NOM", Strings.isNullOrEmpty(flatmate.getPreferredName()) ? flatmate.getLastName() : flatmate.getPreferredName());
             templateId = templateIdGroupApplication;
         }
+
+        sendEmailToTenant(guest, variables, templateId);
+    }
+
+    @Override
+    public void sendEmailInvitationForExistingFlatmates(User flatmate, User guest, InvitationToken invitationToken, ApplicationType applicationType) {
+        Map<String, String> variables = new HashMap<>();
+
+        Long templateId = switch (applicationType) {
+            case COUPLE -> templateIdCoupleApplicationInvitationForExistingTenant;
+            case GROUP -> templateIdGroupApplicationInvitationForExistingTenant;
+            default -> throw new RuntimeException("Something wrong happened - cannot send invitation");
+        };
+        variables.put("tenantFirstName", flatmate.getFirstName());
+        variables.put("tenantFullName", flatmate.getFullName());
+        variables.put("tenantEmail", flatmate.getFullName());
+        variables.put("acceptInvitationUrl", acceptInvitationUrlForExistingTenant + invitationToken.getToken());
 
         sendEmailToTenant(guest, variables, templateId);
     }
