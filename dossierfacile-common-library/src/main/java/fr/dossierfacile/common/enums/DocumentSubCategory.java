@@ -79,4 +79,17 @@ public enum DocumentSubCategory {
         return values;
     }
 
+    public static DocumentSubCategory getFromDSNNature(String code){
+        return switch(code){
+            case "01" -> CDI;
+            case "02" -> CDD;
+            case "03" -> CTT;
+            case "07" -> INTERMITTENT;
+            case "08" -> CTT;
+            case "09", "10" -> PUBLIC;
+            default -> OTHER;
+        };
+
+    }
+
 }

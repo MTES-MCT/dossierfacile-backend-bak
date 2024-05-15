@@ -4,6 +4,7 @@ import fr.dossierfacile.api.front.mapper.TenantMapper;
 import fr.dossierfacile.api.front.model.tenant.TenantModel;
 import fr.dossierfacile.api.front.register.SaveStep;
 import fr.dossierfacile.api.front.register.form.tenant.NamesForm;
+import fr.dossierfacile.api.front.service.DsnService;
 import fr.dossierfacile.api.front.service.interfaces.ApartmentSharingService;
 import fr.dossierfacile.api.front.service.interfaces.DocumentService;
 import fr.dossierfacile.api.front.service.interfaces.TenantStatusService;
@@ -13,10 +14,10 @@ import fr.dossierfacile.common.enums.DocumentCategory;
 import fr.dossierfacile.common.enums.TypeGuarantor;
 import fr.dossierfacile.common.repository.TenantCommonRepository;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class Names implements SaveStep<NamesForm> {
     private final ApartmentSharingService apartmentSharingService;
     private final DocumentService documentService;
     private final TenantStatusService tenantStatusService;
+    private final DsnService dnsService;
 
     @Override
     @Transactional
@@ -41,7 +43,7 @@ public class Names implements SaveStep<NamesForm> {
                 || !StringUtils.equals(tenant.getLastName(), namesForm.getLastName())
                 || !StringUtils.equals(tenant.getPreferredName(), namesForm.getPreferredName())) {
             List<Document> documentsToCheck = new ArrayList<>(tenant.getDocuments());
-            if (CollectionUtils.isNotEmpty(tenant.getGuarantors())
+            if (!CollectionUtils.isEmpty(tenant.getGuarantors())
                     && (tenant.getGuarantors().getFirst().getTypeGuarantor() == TypeGuarantor.LEGAL_PERSON
                     || tenant.getGuarantors().getFirst().getTypeGuarantor() == TypeGuarantor.ORGANISM)) {
                 documentsToCheck.addAll(tenant.getGuarantors().getFirst().getDocuments());
@@ -57,6 +59,10 @@ public class Names implements SaveStep<NamesForm> {
         tenant.lastUpdateDateProfile(LocalDateTime.now(), null);
         apartmentSharingService.resetDossierPdfGenerated(tenant.getApartmentSharing());
         tenant = tenantStatusService.updateTenantStatus(tenant);
+
+        // ici on va lancer la recuperation des informations de la DSN
+        // Finallement dans le mappeur
+
         return tenantMapper.toTenantModel(tenantRepository.save(tenant));
     }
 }

@@ -1,6 +1,7 @@
 package fr.dossierfacile.api.front.model.tenant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import fr.dossierfacile.common.entity.DSNContract;
 import fr.dossierfacile.common.enums.TenantFileStatus;
 import fr.dossierfacile.common.enums.TenantType;
 import lombok.AllArgsConstructor;
@@ -34,4 +35,5 @@ public class TenantModel {
     private boolean franceConnect;
     private boolean passwordEnabled;
     private String warningMessage;
+    private List<DSNContract> contracts;
 }

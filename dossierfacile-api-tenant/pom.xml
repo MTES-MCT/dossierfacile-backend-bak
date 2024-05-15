@@ -67,6 +67,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.3.31</version> <!-- Remplacez ${spring.version} par la version de Spring que vous utilisez -->
+           <!-- Assurez-vous que cette dépendance est dans la portée de test -->
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>

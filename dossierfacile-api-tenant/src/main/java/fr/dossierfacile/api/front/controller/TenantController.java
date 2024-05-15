@@ -49,6 +49,7 @@ public class TenantController {
     public ResponseEntity<TenantModel> profile(@RequestParam MultiValueMap<String, String> params) {
         Tenant tenant = authenticationFacade.getLoggedTenant(AcquisitionData.from(params));
         tenantService.updateLastLoginDateAndResetWarnings(tenant);
+
         return ok(tenantMapper.toTenantModel(tenant));
     }
 

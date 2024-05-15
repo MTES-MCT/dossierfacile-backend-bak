@@ -1,5 +1,6 @@
 package fr.dossierfacile.api.front.mapper;
 
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import fr.dossierfacile.api.front.model.dfc.tenant.ConnectedTenantModel;
 import fr.dossierfacile.api.front.model.tenant.ApartmentSharingModel;
 import fr.dossierfacile.api.front.model.tenant.DocumentDeniedReasonsModel;
@@ -7,6 +8,7 @@ import fr.dossierfacile.api.front.model.tenant.DocumentModel;
 import fr.dossierfacile.api.front.model.tenant.FileModel;
 import fr.dossierfacile.api.front.model.tenant.SelectedOption;
 import fr.dossierfacile.api.front.model.tenant.TenantModel;
+import fr.dossierfacile.api.front.service.DsnService;
 import fr.dossierfacile.common.entity.Document;
 import fr.dossierfacile.common.entity.File;
 import fr.dossierfacile.common.entity.Tenant;
@@ -36,6 +38,10 @@ public abstract class TenantMapper {
     private static final String DOSSIER_PDF_PATH = "/api/application/fullPdf/";
     private static final String DOSSIER_PATH = "/file/";
 
+    @Autowired
+    @LazyInit
+    protected DsnService dnsService;
+
     @Value("${application.domain}")
     protected String domain;
 
@@ -50,6 +56,7 @@ public abstract class TenantMapper {
     }
 
     @Mapping(target = "passwordEnabled", expression = "java(tenant.getPassword() != null)")
+    @Mapping(target = "contracts", expression = "java(dnsService.contracts(tenant.getEmail()))")
     public abstract TenantModel toTenantModel(Tenant tenant);
 
     @Mapping(target = "name", expression = "java((document.getWatermarkFile() != null )? domain + \"/" + PATH + "/\" + document.getName() : null)")
@@ -100,6 +107,8 @@ public abstract class TenantMapper {
 
         Optional.ofNullable(tenantModel.getGuarantors())
                 .ifPresent(guarantorModels -> guarantorModels.forEach(guarantorModel -> setDocumentDeniedReasonsAndDocumentAndFilesRoutes(guarantorModel.getDocuments(), filePath, false)));
+
+       // tenantModel.setContracts();
 
     }
 
