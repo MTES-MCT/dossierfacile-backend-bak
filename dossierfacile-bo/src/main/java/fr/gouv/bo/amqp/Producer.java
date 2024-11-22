@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class Producer {
     private final QueueMessageRepository queueMessageRepository;
 
+    @Async
     public void generatePdf(Long documentId) {
         log.debug("Sending document with ID [{}] for pdf generation", documentId);
         queueMessageRepository.save(QueueMessage.builder()

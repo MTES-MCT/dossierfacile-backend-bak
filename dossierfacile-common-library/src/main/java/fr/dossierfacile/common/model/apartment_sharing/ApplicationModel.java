@@ -1,7 +1,9 @@
 package fr.dossierfacile.common.model.apartment_sharing;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import fr.dossierfacile.common.entity.UserApi;
 import fr.dossierfacile.common.enums.ApplicationType;
 import fr.dossierfacile.common.enums.FileStatus;
 import fr.dossierfacile.common.enums.PartnerCallBackType;
@@ -31,4 +33,6 @@ public class ApplicationModel {
     private List<TenantModel> tenants;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime lastUpdateDate;
+    @JsonIgnore
+    private UserApi userApi = null;
 }

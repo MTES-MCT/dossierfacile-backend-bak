@@ -1,25 +1,25 @@
 package fr.dossierfacile.api.front.service;
 
+import fr.dossierfacile.common.dto.mail.TenantDto;
 import fr.dossierfacile.api.front.exception.PasswordRecoveryTokenNotFoundException;
 import fr.dossierfacile.api.front.exception.UserNotFoundException;
 import fr.dossierfacile.api.front.mapper.TenantMapper;
+import fr.dossierfacile.common.mapper.mail.TenantMapperForMail;
 import fr.dossierfacile.api.front.model.tenant.TenantModel;
 import fr.dossierfacile.api.front.repository.PasswordRecoveryTokenRepository;
 import fr.dossierfacile.api.front.repository.UserRepository;
 import fr.dossierfacile.api.front.service.interfaces.*;
-import fr.dossierfacile.common.dto.mail.TenantDto;
+import fr.dossierfacile.common.model.apartment_sharing.ApplicationModel;
+import fr.dossierfacile.common.utils.TransactionalUtil;
 import fr.dossierfacile.common.entity.*;
 import fr.dossierfacile.common.enums.ApplicationType;
 import fr.dossierfacile.common.enums.LogType;
 import fr.dossierfacile.common.enums.PartnerCallBackType;
 import fr.dossierfacile.common.enums.TenantType;
-import fr.dossierfacile.common.mapper.mail.TenantMapperForMail;
-import fr.dossierfacile.common.model.apartment_sharing.ApplicationModel;
 import fr.dossierfacile.common.repository.TenantCommonRepository;
 import fr.dossierfacile.common.service.interfaces.LogService;
 import fr.dossierfacile.common.service.interfaces.PartnerCallBackService;
 import fr.dossierfacile.common.service.interfaces.TenantCommonService;
-import fr.dossierfacile.common.utils.TransactionalUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -97,12 +96,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteAccount(Tenant tenant) {
+        List<ApplicationModel> webhookDTOList = new ArrayList<>();
         ApartmentSharing apartmentSharing = tenant.getApartmentSharing();
-        Map<TenantUserApi, ApplicationModel> webhookDTOMap = groupingAllTenantUserApisInTheApartment(apartmentSharing).stream()
-                .collect(Collectors.toMap(
-                        tenantUserApi -> tenantUserApi,
-                        tenantUserApi -> partnerCallBackService.getWebhookDTO(tenant, tenantUserApi.getUserApi(), PartnerCallBackType.DELETED_ACCOUNT)
-                ));
+        groupingAllTenantUserApisInTheApartment(apartmentSharing).forEach((tenantUserApi) -> {
+            UserApi userApi = tenantUserApi.getUserApi();
+            webhookDTOList.add(partnerCallBackService.getWebhookDTO(tenant, userApi, PartnerCallBackType.DELETED_ACCOUNT));
+        });
         logService.saveLogWithTenantData(LogType.ACCOUNT_DELETE, tenant);
         TenantDto tenantToDeleteDto = tenantMapperForMail.toDto(tenant);
         tenantCommonService.deleteTenantData(tenant);
@@ -117,8 +116,9 @@ public class UserServiceImpl implements UserService {
             userRepository.delete(tenant);
             apartmentSharingService.removeTenant(tenant.getApartmentSharing(), tenant);
         }
-        webhookDTOMap.forEach((tenantUserApi, webhookDTO) -> partnerCallBackService.sendCallBack(tenant, tenantUserApi.getUserApi(), webhookDTO));
-
+        for (ApplicationModel webhookDTO : webhookDTOList) {
+            partnerCallBackService.sendCallBack(tenant, webhookDTO.getUserApi(), webhookDTO);
+        }
 
         TransactionalUtil.afterCommit(() -> {
             mailService.sendEmailAccountDeleted(tenantToDeleteDto);

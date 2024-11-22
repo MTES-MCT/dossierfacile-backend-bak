@@ -89,10 +89,10 @@ public class WebSecurityConfig {
     @Bean
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(200);
-        executor.setThreadNamePrefix("BOAsyncExecutor-");
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("Mailer-");
         executor.initialize();
         return executor;
     }

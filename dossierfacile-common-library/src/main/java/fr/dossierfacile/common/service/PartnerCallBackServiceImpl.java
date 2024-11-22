@@ -19,10 +19,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,15 +89,12 @@ public class PartnerCallBackServiceImpl implements PartnerCallBackService {
         if (apartmentSharing.isEmpty()) {
             return;
         }
-        Map<UserApi, ApplicationModel> applicationModelMap = findAllUserApi(tenant.getApartmentSharing()).stream()
-                .collect(Collectors.toMap(
-                        userApi -> userApi,
-                        userApi -> getWebhookDTO(tenant, userApi, partnerCallBackType)
-                ));
+        List<ApplicationModel> applicationModelList = findAllUserApi(tenant.getApartmentSharing()).stream()
+                .map(userApi -> getWebhookDTO(tenant, userApi, partnerCallBackType)).toList();
 
         TransactionalUtil.afterCommit(() -> {
             try {
-                applicationModelMap.forEach((userApi, applicationModel) -> sendCallBack(tenant, userApi, applicationModel));
+                applicationModelList.forEach(model -> sendCallBack(tenant, model.getUserApi(), model));
             } catch (Exception e) {
                 log.error("CAUTION Unable to send notification to partner", e);
             }
@@ -134,6 +135,7 @@ public class PartnerCallBackServiceImpl implements PartnerCallBackService {
         ApplicationModel applicationModel = new ApplicationModel();
         applicationModel.setOnTenantId(tenant.getId());
         applicationModel.setPartnerCallBackType(PartnerCallBackType.ACCESS_REVOKED);
+        applicationModel.setUserApi(userApi);
 
         sendCallBack(tenant, userApi, applicationModel);
     }
@@ -142,6 +144,7 @@ public class PartnerCallBackServiceImpl implements PartnerCallBackService {
     public ApplicationModel getWebhookDTO(Tenant tenant, UserApi userApi, PartnerCallBackType partnerCallBackType) {
         ApartmentSharing apartmentSharing = tenant.getApartmentSharing();
         ApplicationModel applicationModel = applicationFullMapper.toApplicationModel(apartmentSharing, userApi);
+        applicationModel.setUserApi(userApi);
 
         List<Tenant> tenantList = tenantRepository.findAllByApartmentSharing(apartmentSharing);
         for (Tenant t : tenantList) {
