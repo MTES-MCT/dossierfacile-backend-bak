@@ -73,23 +73,22 @@ public class TenantService {
     @Value("${process.max.dossier.by.day:600}")
     private Long maxDossiersByDay;
 
-    public List<Tenant> getTenantByIdOrEmail(EmailDTO emailDTO) {
-        List<Tenant> tenantList = new ArrayList<>();
-        if (isNumeric(emailDTO.getEmail())) {
-            tenantList.add(tenantRepository.findOneById(Long.parseLong(emailDTO.getEmail())));
-            return tenantList;
+    public Page<Tenant> getTenantByIdOrEmail(String email, Pageable pageable) {
+        if (isNumeric(email)) {
+            List<Tenant> result = Optional.ofNullable(tenantRepository.findOneById(Long.parseLong(email)))
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+            return new PageImpl<>(result, pageable, result.size());
         }
-        if (emailDTO.getEmail().contains("@")) {
-            tenantList.add(tenantRepository.findByEmailIgnoreCase(emailDTO.getEmail()).get());
-            tenantList.add(Tenant.builder().build());
-            return tenantList;
+        if (email.contains("@")) {
+            List<Tenant> result = tenantRepository.findByEmailIgnoreCase(email)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+            return new PageImpl<>(result, pageable, result.size());
         }
-        return searchTenantByName(emailDTO);
+        return tenantRepository.findTenantByFirstNameOrLastNameOrFullName(email.toLowerCase(Locale.ROOT), pageable);
     }
 
-    public List<Tenant> searchTenantByName(EmailDTO emailDTO) {
-        return tenantRepository.findTenantByFirstNameOrLastNameOrFullName(emailDTO.getEmail().toLowerCase(Locale.ROOT));
-    }
 
     public Tenant findTenantById(Long id) {
         return tenantRepository.findOneById(id);
@@ -106,10 +105,6 @@ public class TenantService {
     public Page<Tenant> listTenantsToProcess(Pageable pageable) {
         LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(timeReprocessApplicationMinutes);
         return new PageImpl<>(tenantRepository.findTenantsToProcess(localDateTime, pageable).toList());
-    }
-
-    public Page<Tenant> listTenantsFilter(Pageable pageable, String q) {
-        return tenantRepository.findByFirstNameContainingOrLastNameContainingOrEmailContaining(q, q, q, pageable);
     }
 
     public Tenant find(Long id) {

@@ -1,6 +1,5 @@
 package fr.gouv.bo.controller;
 
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ public class BOToolsController {
 
     @GetMapping("/bo/tools")
     public String outils(Model model) {
-        model.addAttribute("email", new EmailDTO());
         return "bo/tools";
     }
 
@@ -35,7 +33,6 @@ public class BOToolsController {
             log.error("Error regenerating status for tenants", e);
             model.addAttribute("errorMessage", "Quelque chose c'est mal passé: " + e.getMessage());
         }
-        model.addAttribute("email", new EmailDTO());
         return "bo/tools";
     }
 

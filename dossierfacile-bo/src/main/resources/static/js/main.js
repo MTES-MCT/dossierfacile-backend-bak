@@ -119,14 +119,6 @@ $(document).ready(function () {
         });
     });
 
-    $("#input-search").keypress(function (e) {
-        if (e.which == 13) {
-            e.preventDefault();
-            var q = $(this).val();
-            window.location.href = "/bo/searchResult?q=" + q;
-        }
-    });
-
     $("#date-statistic").change(function (e) {
         modifyHref();
     });

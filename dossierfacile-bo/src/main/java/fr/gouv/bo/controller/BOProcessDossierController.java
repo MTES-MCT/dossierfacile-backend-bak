@@ -2,7 +2,6 @@ package fr.gouv.bo.controller;
 
 import fr.dossierfacile.common.entity.ProcessingCapacity;
 import fr.dossierfacile.common.repository.ProcessingCapacityRepository;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.dto.ProcessCapacitiesDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequestMapping("/bo/admin/process")
 @Slf4j
 public class BOProcessDossierController {
-    private static final String EMAIL = "email";
+
     private final ProcessingCapacityRepository processingCapacityRepository;
 
     @GetMapping("/capacities")
@@ -43,7 +42,6 @@ public class BOProcessDossierController {
         ProcessCapacitiesDTO pcDto = ProcessCapacitiesDTO.builder().list(capacities).build();
 
         model.addAttribute("processCapacitiesDTO", pcDto);
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/process-capacities";
     }
 

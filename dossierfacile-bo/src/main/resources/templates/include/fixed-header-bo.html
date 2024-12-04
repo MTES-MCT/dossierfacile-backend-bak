@@ -9,17 +9,24 @@
         </div
         >
         <div class="col">
-                <form th:method="get" th:action="@{/bo/searchTenant}" th:object="${email}" >
-                    <div class="wrap">
-                        <div class="search">
-                            <input  required=""  oninvalid="this.setCustomValidity('remplissez ce champ')"
-                                    oninput="setCustomValidity('')"  th:field="*{email}" type="text" class="form-control searchTerm" placeholder="Find tenant ..." style="border: 1px solid #00b4cc !important;height: auto;">
-                            <button type="submit" class="searchButton">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
+            <form th:method="get" th:action="@{/bo/searchTenant}">
+                <div class="wrap">
+                    <div class="search">
+                        <input required
+                               oninvalid="this.setCustomValidity('Recherche locataire...')"
+                               oninput="setCustomValidity('')"
+                               th:value="${email}"
+                               name="email"
+                               type="text"
+                               class="form-control searchTerm"
+                               placeholder="Find tenant ..."
+                               style="border: 1px solid #00b4cc !important; height: auto;">
+                        <button type="submit" class="searchButton">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
-                </form>
+                </div>
+            </form>
         </div>
         <div class="col d-flex justify-content-end align-items-center me-4">
             <button class="btn-theme-change"><i class="fa fa-moon-o"></i></button>

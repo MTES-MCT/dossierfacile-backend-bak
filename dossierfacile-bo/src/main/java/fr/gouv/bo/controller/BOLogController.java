@@ -1,7 +1,6 @@
 package fr.gouv.bo.controller;
 
 import fr.dossierfacile.common.entity.TenantLog;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.dto.Pager;
 import fr.gouv.bo.service.TenantLogService;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +25,6 @@ public class BOLogController {
     private static final String INITIAL_PAGE = "1";
     private static final String INITIAL_PAGE_SIZE = "50";
     private static final int[] PAGE_SIZES = {50, 100};
-    private static final String EMAIL = "email";
 
     @Autowired
     private TenantLogService logService;
@@ -58,7 +56,6 @@ public class BOLogController {
         model.addAttribute("pageSizes", PAGE_SIZES);
         model.addAttribute("pager", pager);
 
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/log";
     }
 }

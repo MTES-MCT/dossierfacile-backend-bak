@@ -13,7 +13,6 @@ import fr.dossierfacile.common.model.apartment_sharing.ApplicationModel;
 import fr.dossierfacile.common.service.interfaces.PartnerCallBackService;
 import fr.gouv.bo.dto.CustomMessage;
 import fr.gouv.bo.dto.DisplayableFile;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.dto.GuarantorItem;
 import fr.gouv.bo.dto.ItemDetail;
 import fr.gouv.bo.dto.MessageDTO;
@@ -174,8 +173,6 @@ public class BOTenantController {
         TenantInfoHeader header = TenantInfoHeader.build(tenant,
                 userApiService.findPartnersLinkedToTenant(id),
                 logService.getLogByTenantId(id));
-        EmailDTO emailDTO = new EmailDTO();
-        model.addAttribute(EMAIL, emailDTO);
         model.addAttribute(HEADER, header);
         model.addAttribute(NEW_MESSAGE, findNewMessageFromTenant(id));
         model.addAttribute(TENANT, tenant);

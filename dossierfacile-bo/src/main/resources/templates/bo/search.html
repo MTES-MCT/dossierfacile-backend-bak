@@ -24,12 +24,12 @@
     </div>
     <div class="container">
         <div class="text-center margin-bottom">
-            <span>Recherche de '<span id="search-text" th:text="${keySearch}"></span>' </span>
-            <span th:text="'Nombre de locataires trouvés: ' + ${matchList.size()}"></span>
+            <span>Recherche de '<span id="search-text" th:text="${email}"></span>' </span>
+            <span th:text="'Nombre de locataires trouvés: ' + ${tenants.totalElements}"></span>
         </div>
         <div class="clearfix"></div>
         <div class="table-responsive">
-            <table th:object="${matchList}" id="userTable" class="table table-striped table-bordered table-hover">
+            <table th:object="${tenants}" id="userTable" class="table table-striped table-bordered table-hover">
                 <thead>
                 <tr>
                     <td></td>
@@ -40,8 +40,8 @@
                     <td>Email</td>
                 </tr>
                 </thead>
-                <tr th:each="tenant : ${matchList}">
-                    <td><a class="btn btn-warning bo-btn" th:href="'/bo/nextApplication?tenant_id='+${tenant.getId()}">
+                <tr th:each="tenant : ${tenants}">
+                    <td><a class="btn btn-warning bo-btn" th:href="'/bo/tenant/'+${tenant.getId()}">
                         voir le compte
                     </a></td>
                     <td>
@@ -54,6 +54,7 @@
                 </tr>
             </table>
         </div>
+        <div th:replace="~{bo/fragments/pagination :: pagination (items=${tenants}, paramKey='email', paramValue=${email}, pageSizes=${pageSizes}, endpoint='/bo/searchTenant')}"></div>
 
     </div>
 </div>

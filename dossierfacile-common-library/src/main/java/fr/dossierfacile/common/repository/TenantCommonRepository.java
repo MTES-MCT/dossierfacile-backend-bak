@@ -22,8 +22,8 @@ public interface TenantCommonRepository extends JpaRepository<Tenant, Long> {
 
     boolean existsByEmail(String email);
 
-    @Query("select distinct t FROM Tenant t where concat(LOWER(t.firstName),' ',LOWER(t.lastName)) like CONCAT('%',:nameUser,'%') ")
-    List<Tenant> findTenantByFirstNameOrLastNameOrFullName(@Param("nameUser") String nameUser);
+    @Query("select distinct t FROM Tenant t where concat(LOWER(coalesce(t.firstName, '')),' ',LOWER(coalesce(t.lastName, ''))) like CONCAT('%', :nameUser, '%')")
+    Page<Tenant> findTenantByFirstNameOrLastNameOrFullName(@Param("nameUser") String nameUser, Pageable pageable);
 
     @Query("select t from Tenant t " +
             " where (t.operatorDateTime is null or t.operatorDateTime < :localDateTime)" +
@@ -58,8 +58,6 @@ public interface TenantCommonRepository extends JpaRepository<Tenant, Long> {
         refreshMaterializedView("latest_operator");
         refreshMaterializedView("ranked_tenant");
     }
-
-    Page<Tenant> findByFirstNameContainingOrLastNameContainingOrEmailContaining(String q, String q1, String q2, Pageable pageable);
 
     @Query("""
             SELECT t

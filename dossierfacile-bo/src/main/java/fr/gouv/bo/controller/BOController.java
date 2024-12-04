@@ -9,11 +9,7 @@ import fr.dossierfacile.common.enums.PartnerCallBackType;
 import fr.dossierfacile.common.enums.Role;
 import fr.dossierfacile.common.service.interfaces.PartnerCallBackService;
 import fr.gouv.bo.amqp.Producer;
-import fr.gouv.bo.dto.BooleanDTO;
-import fr.gouv.bo.dto.EmailDTO;
-import fr.gouv.bo.dto.Pager;
-import fr.gouv.bo.dto.ReGroupDTO;
-import fr.gouv.bo.dto.ResultDTO;
+import fr.gouv.bo.dto.*;
 import fr.gouv.bo.service.DocumentService;
 import fr.gouv.bo.service.TenantService;
 import fr.gouv.bo.service.UserService;
@@ -25,21 +21,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 
 @Slf4j
@@ -101,11 +93,9 @@ public class BOController {
     public String documentFailedList(Model model,
                                      @RequestParam(value = "pageSize", defaultValue = INITIAL_PAGE_SIZE) int pageSize,
                                      @RequestParam(value = "page", defaultValue = INITIAL_PAGE) int page) {
-        EmailDTO emailDTO = new EmailDTO();
 
         Page<Tenant> tenants = tenantService.getAllTenantsToProcessWithFailedGeneratedPdfDocument(PageRequest.of(page, pageSize));
         Pager pager = new Pager(tenants.getTotalPages(), tenants.getNumber(), BUTTONS_TO_SHOW);
-        model.addAttribute(EMAIL, emailDTO);
         model.addAttribute(PAGER, pager);
         model.addAttribute(PAGE_SIZES_STRING, PAGE_SIZES);
         model.addAttribute(SELECTED_PAGE_SIZE, pageSize);
@@ -119,7 +109,7 @@ public class BOController {
                      @RequestParam(value = "pageSize", defaultValue = INITIAL_PAGE_SIZE) int pageSize,
                      @RequestParam(value = "page", defaultValue = INITIAL_PAGE) int page,
                      Principal principal) {
-        EmailDTO emailDTO = new EmailDTO();
+
         Page<Tenant> tenants = tenantService.listTenantsToProcess(PageRequest.of(page, pageSize));
         Pager pager = new Pager(tenants.getTotalPages(), tenants.getNumber(), BUTTONS_TO_SHOW);
         User login_user = userService.findUserByEmail(principal.getName());
@@ -135,15 +125,12 @@ public class BOController {
         model.addAttribute(SELECTED_PAGE_SIZE, pageSize);
         model.addAttribute(PAGE_SIZES_STRING, PAGE_SIZES);
         model.addAttribute(PAGER, pager);
-        model.addAttribute(EMAIL, emailDTO);
         model.addAttribute(OLDEST_APPLICATION, tenantService.getOldestToProcessApplication());
         return "bo/index";
     }
 
     @GetMapping("/bo/regroup")
     public String getRegroupTenants(RedirectAttributes redirectAttributes, Model model, ReGroupDTO reGroupDTO, @ModelAttribute("showAlert") BooleanDTO booleanDTO) {
-        EmailDTO emailDTO1 = new EmailDTO();
-        model.addAttribute(EMAIL, emailDTO1);
         model.addAttribute("reGroupData", reGroupDTO);
         if (booleanDTO.isAlertValue()) {
             redirectAttributes.addFlashAttribute(SHOW_ALERT, booleanDTO);
@@ -182,47 +169,23 @@ public class BOController {
 
 
     @GetMapping("/bo/searchTenant")
-    public String searchTenant(Model model, EmailDTO emailDTO, RedirectAttributes redirectAttributes) {
+    public String searchTenant(Model model,
+                               @RequestParam(value = EMAIL) String email,
+                               @RequestParam(value = "pageSize", defaultValue = "100") int pageSize,
+                               @RequestParam(value = "page", defaultValue = "1") int page) {
 
-        List<Tenant> tenantList = tenantService.getTenantByIdOrEmail(emailDTO);
+        PageRequest pageable = PageRequest.of(page - 1, pageSize, Sort.by("id").descending());
+        Page<Tenant> tenants = tenantService.getTenantByIdOrEmail(email, pageable);
 
-        if (tenantList.isEmpty() || emailDTO.getEmail().isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "No tenant by that name !");
-            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-            return REDIRECT_BO;
+        if (tenants.getTotalElements() == 1 && (email.contains("@") || StringUtils.isNumeric(email))) {
+            return REDIRECT_BO_COLOCATION + tenants.getContent().getFirst().getApartmentSharing().getId();
         }
 
-        if (tenantList.get(0) == null) {
-            redirectAttributes.addFlashAttribute("message", "Tenant not found !");
-            redirectAttributes.addFlashAttribute("alertClass", "alert-danger");
-            return REDIRECT_BO;
-        }
-
-        if (emailDTO.getEmail().contains("@") || StringUtils.isNumeric(emailDTO.getEmail())) {
-            return REDIRECT_BO_COLOCATION + tenantList.get(0).getApartmentSharing().getId();
-        }
-
-        EmailDTO emailDTOSave = new EmailDTO();
-        model.addAttribute(EMAIL, emailDTOSave);
-        model.addAttribute("matchList", tenantList);
-        model.addAttribute("keySearch", emailDTO.getEmail());
-
-        return "bo/search";
-
-    }
-
-    @GetMapping("/bo/searchResult")
-    public String searchResult(Model model,
-                               @RequestParam(value = "q", defaultValue = "") String q,
-                               @RequestParam(value = "pageSize", defaultValue = INITIAL_PAGE_SIZE) int pageSize,
-                               @RequestParam(value = "page", defaultValue = INITIAL_PAGE) int page) {
-        Page<Tenant> tenants = tenantService.listTenantsFilter(PageRequest.of(page, pageSize), q);
-        Pager pager = new Pager(tenants.getTotalPages(), tenants.getNumber(), BUTTONS_TO_SHOW);
         model.addAttribute("tenants", tenants);
-        model.addAttribute(SELECTED_PAGE_SIZE, pageSize);
-        model.addAttribute(PAGE_SIZES_STRING, PAGE_SIZES);
-        model.addAttribute(PAGER, pager);
-        return "bo/searchResult";
+        model.addAttribute("pageSize", pageable.getPageSize());
+        model.addAttribute("pageSizes", PAGE_SIZES);
+        model.addAttribute(EMAIL, email);
+        return "bo/search";
     }
 
     @GetMapping("/bo/nextApplication")

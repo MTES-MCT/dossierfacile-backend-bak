@@ -3,7 +3,6 @@ package fr.gouv.bo.controller;
 import fr.dossierfacile.common.entity.DocumentDeniedOptions;
 import fr.dossierfacile.common.enums.DocumentSubCategory;
 import fr.gouv.bo.dto.DocumentDeniedOptionsDTO;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.service.DocumentDeniedOptionsService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +34,6 @@ public class BODocumentDeniedOptionsController {
 
         model.addAttribute("documentDeniedOptions", documentDeniedOptions);
         model.addAttribute("documentSubCategories", DocumentSubCategory.alphabeticallySortedValues());
-        model.addAttribute(EMAIL, new EmailDTO());
 
         return "bo/document-denied-options";
     }
@@ -48,7 +46,6 @@ public class BODocumentDeniedOptionsController {
             return "redirect:/bo/documentDeniedOptions";
         }
         model.addAttribute("documentDeniedOption", optionToEdit.get());
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/edit-document-denied-option";
     }
 
@@ -57,7 +54,6 @@ public class BODocumentDeniedOptionsController {
         model.addAttribute("documentSubCategories", DocumentSubCategory.alphabeticallySortedValues());
         model.addAttribute("documentUserTypes", DOCUMENT_USER_TYPES);
         model.addAttribute("documentDeniedOption", new DocumentDeniedOptionsDTO());
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/create-document-denied-option";
     }
 

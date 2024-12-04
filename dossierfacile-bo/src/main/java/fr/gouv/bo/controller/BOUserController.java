@@ -20,12 +20,10 @@ import java.util.Collections;
 @Controller
 @RequiredArgsConstructor
 public class BOUserController {
-    private static final String EMAIL = "email";
     private final UserService userService;
 
     @GetMapping("/bo/users")
     public String getBOUser(Model model) {
-        model.addAttribute(EMAIL, new EmailDTO());
         model.addAttribute("users", userService.findAll());
         return "bo/users";
     }

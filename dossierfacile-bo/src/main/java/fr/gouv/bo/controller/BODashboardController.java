@@ -1,7 +1,6 @@
 package fr.gouv.bo.controller;
 
 import fr.dossierfacile.common.entity.BOUser;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.service.TenantLogService;
 import fr.gouv.bo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ public class BODashboardController {
         model.addAttribute("operator", operator);
         model.addAttribute("listTreatedCountByDay", listTreatedCountByDay);
 
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/dashboard";
     }
 
@@ -52,7 +50,6 @@ public class BODashboardController {
         model.addAttribute("listTreatedCountByOperator", listTreatedCountByOperator);
         model.addAttribute("dailyCount", dailyCount);
 
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/dashboard-admin";
     }
 }

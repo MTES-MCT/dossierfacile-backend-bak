@@ -2,7 +2,6 @@ package fr.gouv.bo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.dossierfacile.common.entity.Property;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.mapper.PropertyMapper;
 import fr.gouv.bo.model.owner.PropertyModel;
 import fr.gouv.bo.service.PropertyService;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(value = "/bo/properties")
 public class BOPropertyController {
-    private static final String EMAIL = "email";
 
     @Autowired
     private PropertyService propertyService;
@@ -34,7 +32,6 @@ public class BOPropertyController {
 
         model.addAttribute("property", propertyModel);
         model.addAttribute("propertyLink", propertyLinkBaseUrl + "/" + property.getToken());
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/property";
     }
 }

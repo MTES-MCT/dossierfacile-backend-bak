@@ -2,7 +2,6 @@ package fr.gouv.bo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.dossierfacile.common.entity.UserApi;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.dto.UserApiDTO;
 import fr.gouv.bo.service.KeycloakService;
 import fr.gouv.bo.service.UserApiService;
@@ -21,7 +20,6 @@ import java.util.List;
 @RequestMapping("/bo/userApi")
 @Slf4j
 public class BOUserApiController {
-    private static final String EMAIL = "email";
     private static final String REDIRECT_URL = "redirect:/bo/userApi";
     private final UserApiService userApiService;
     private final KeycloakService keycloakService;
@@ -32,7 +30,6 @@ public class BOUserApiController {
         List<UserApi> userApiList = userApiService.findAll();
         model.addAttribute("userApiList", userApiList);
         model.addAttribute("userApiDTO", new UserApiDTO());
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/user-api";
     }
 
@@ -57,7 +54,6 @@ public class BOUserApiController {
         model.addAttribute("userApiDTO", userApiDTO);
         model.addAttribute("userApi", userApi);
         model.addAttribute("kcClient", keycloakService.getKeyCloakClient(userApi.getName()));
-        model.addAttribute(EMAIL, new EmailDTO());
         return "bo/user-api-edit";
     }
 
@@ -69,7 +65,6 @@ public class BOUserApiController {
             return "redirect:/error";
         }
         userApiService.sendMailWithConfig(partnerEmail, userApi);
-        model.addAttribute(EMAIL, new EmailDTO());
         return REDIRECT_URL;
     }
 

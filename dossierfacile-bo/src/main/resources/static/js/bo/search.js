@@ -4,7 +4,6 @@
             const elementsToHighlight = document.querySelectorAll('.to-highlight');
             const regex = new RegExp(`${keySearch}`, 'gi');
             elementsToHighlight.forEach(element => {
-                console.log(element);
                 element.innerHTML = element.innerHTML.replace(regex, "<span class='highlight'>$&</span>");
             });
         });

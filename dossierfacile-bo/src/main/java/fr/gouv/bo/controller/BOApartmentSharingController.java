@@ -3,7 +3,6 @@ package fr.gouv.bo.controller;
 import fr.dossierfacile.common.entity.Document;
 import fr.dossierfacile.common.entity.Tenant;
 import fr.gouv.bo.dto.DisplayableFile;
-import fr.gouv.bo.dto.EmailDTO;
 import fr.gouv.bo.dto.MessageDTO;
 import fr.gouv.bo.dto.PartnerDTO;
 import fr.dossierfacile.common.service.ApartmentSharingLinkService;
@@ -61,12 +60,10 @@ public class BOApartmentSharingController {
 
         MessageDTO messageDTO = new MessageDTO();
         PartnerDTO partnerDTO = new PartnerDTO();
-        EmailDTO emailDTO = new EmailDTO();
 
         List<Tenant> tenants = tenantService.findAllTenantsByApartmentSharingAndReorderDocumentsByCategory(id);
 
         model.addAttribute(TENANTS, tenants);
-        model.addAttribute(EMAIL, emailDTO);
         model.addAttribute(LOG_SER, logService);
         model.addAttribute(MESSAGE_DTO, messageDTO);
         model.addAttribute(PARTNER_UPDATE, partnerDTO);
