@@ -15,7 +15,7 @@
     <description>Front api for dossier facile</description>
 
     <properties>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
     </properties>
 
     <dependencies>
