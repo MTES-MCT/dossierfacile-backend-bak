@@ -44,7 +44,7 @@
         <imageio.version>3.12.0</imageio.version>
 
         <!--Libraries needed for OVH storage-->
-        <openstack4j.version>3.11</openstack4j.version>
+        <openstack4j.version>3.12</openstack4j.version>
         <amazonaws.version>1.12.525</amazonaws.version>
         <liquibase-sessionlock.version>1.6.9</liquibase-sessionlock.version>
     </properties>
