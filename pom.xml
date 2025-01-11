@@ -39,7 +39,7 @@
         <dossierfacile.version>0.0.1-SNAPSHOT</dossierfacile.version>
         <logback-encoder.version>7.4</logback-encoder.version>
         <commons-io.version>2.17.0</commons-io.version>
-        <okio.version>3.9.1</okio.version>
+        <okio.version>3.10.0</okio.version>
         <pdfbox.version>3.0.3</pdfbox.version>
         <pdfbox-tools.version>3.0.3</pdfbox-tools.version>
         <jbig2-imageio.version>3.0.4</jbig2-imageio.version>
