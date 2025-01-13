@@ -5,7 +5,7 @@ application-*.properties
 !application-test.properties
 .env
 target/
-mockstorage/
+mock_storage/
 .DS_Store
 static-front/
 logs/
@@ -43,4 +43,3 @@ tmp
 
 # Used in test
 7fdad8b1*
-

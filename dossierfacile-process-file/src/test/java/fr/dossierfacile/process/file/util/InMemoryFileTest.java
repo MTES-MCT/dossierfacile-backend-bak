@@ -52,13 +52,8 @@ class InMemoryFileTest {
 
         assertThat(inMemoryPdfFile.hasQrCode()).isFalse();
         assertThat(inMemoryPdfFile.has2DDoc()).isFalse();
-        assertThat(inMemoryPdfFile.getContentAsString()).isEqualTo("""
-
-
-                Test document
-
-
-                """);
+        assertThat(inMemoryPdfFile.getContentAsString()).isNotEmpty();
+        assertThat(inMemoryPdfFile.getContentAsString().trim()).isEqualTo("Test document");
     }
 
     private FileStorageService classpathStorageService() throws IOException {

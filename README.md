@@ -40,15 +40,14 @@ Create a new folder `mock_storage` to store files.
 Create the file `application-dev.properties` in `dossierfacile-bo/src/main/resources`
 
 ```properties
-mock.storage.path=/path/to/mock_storage/
 server.port=8081
 application.name=bo
 application.domain=http://localhost:8081
 domain.protocol=http
 environment=localhost
 
-mock.storage.path=mockstorage
 storage.provider.list=LOCAL
+mock.storage.path=mock_storage
 
 # SQL
 spring.datasource.url=jdbc:postgresql://localhost:5432/dossierfacile
@@ -82,7 +81,7 @@ brevo.apikey=
 Create the file `application-dev.properties` in `dossierfacile-api-tenant/src/main/resources`
 
 ```properties
-mock.storage.path=/path/to/mock_storage/
+mock.storage.path=mock_storage
 storage.provider.list=LOCAL
 api.version=3
 tenant.base.url=localhost:9002
@@ -106,7 +105,7 @@ brevo.apikey=
 Create the file `application-dev.properties` in `dossierfacile-api-owner/src/main/resources`
 
 ```properties
-mock.storage.path=/path/to/mock_storage/
+mock.storage.path=mock_storage
 owner.url=http://localhost:3000
 server.port=8083
 # SQL
@@ -129,7 +128,7 @@ brevo.apikey=
 Create the file `application-dev.properties` in `dossierfacile-process-file/src/main/resources`
 
 ```properties
-mock.storage.path=/path/to/mock_storage/
+mock.storage.path=mock_storage
 storage.provider.list=LOCAL
 server.port=8088
 # SQL
@@ -149,7 +148,7 @@ Create the file `application-dev.properties` in `dossierfacile-api-watermark/src
 
 ```properties
 server.port=8091
-mock.storage.path=/path/to/mock_storage/
+mock.storage.path=mock_storage
 storage.provider.list=LOCAL
 # SQL
 spring.datasource.url=jdbc:postgresql://localhost:5433/dossierfacile
@@ -160,7 +159,7 @@ spring.datasource.password=
 Create the file `application-dev.properties` in `dossierfacile-pdf-generator/src/main/resources`
 
 ```properties
-mock.storage.path=/path/to/mock_storage/
+mock.storage.path=mock_storage
 storage.provider.list=LOCAL
 # SQL
 spring.datasource.url= jdbc:postgresql://localhost:5433/dossierfacile
